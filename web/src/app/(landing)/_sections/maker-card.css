@@ -1,0 +1,201 @@
+/* Spotlight: a soft light that follows the pointer (this section's one glow). */
+.mk-spot {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--hair);
+  background: var(--ink-1);
+  transition: border-color 300ms ease;
+}
+.mk-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 90, 54, 0.11), transparent 60%);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}
+.mk-spot:hover {
+  border-color: var(--hair-2);
+}
+.mk-spot:hover::before {
+  opacity: 1;
+}
+
+/* ---------- maker card ---------- */
+.mk-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 28px;
+  color: inherit;
+  text-decoration: none;
+}
+@media (min-width: 640px) {
+  .mk-card {
+    padding: 36px;
+  }
+}
+.mk-name-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 20px;
+  padding-bottom: 10px;
+}
+.mk-name {
+  font-size: clamp(38px, 4.4vw, 54px);
+  white-space: nowrap;
+}
+.mk-l {
+  display: inline-block;
+  white-space: pre;
+  will-change: transform;
+}
+
+/* First view: letters rise out of a blur */
+.mk-name-wrap .mk-l {
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(8px);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 900ms var(--ease-out),
+    filter 700ms var(--ease-out);
+  transition-delay: calc(var(--i) * 32ms);
+}
+.mk-name-wrap[data-in="true"] .mk-l {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Hover: pluck the name */
+.mk-card:hover .mk-name-wrap[data-in="true"] .mk-l {
+  animation: mk-wave 760ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 24ms);
+}
+@keyframes mk-wave {
+  0% { transform: translateY(0); }
+  28% { transform: translateY(-0.14em); }
+  56% { transform: translateY(0.04em); }
+  78% { transform: translateY(-0.015em); }
+  100% { transform: translateY(0); }
+}
+
+/* The string under the name: draws in, then wobbles to rest */
+.mk-string {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--pom);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 650ms var(--ease-out);
+}
+.mk-card:hover .mk-string {
+  transform: scaleX(1);
+  animation: mk-pluck 900ms var(--ease-out) 380ms;
+}
+@keyframes mk-pluck {
+  0% { transform: scaleX(1) translateY(0); }
+  15% { transform: scaleX(1) translateY(-2.5px); }
+  32% { transform: scaleX(1) translateY(2px); }
+  50% { transform: scaleX(1) translateY(-1.2px); }
+  68% { transform: scaleX(1) translateY(0.6px); }
+  100% { transform: scaleX(1) translateY(0); }
+}
+
+.mk-copy {
+  margin-top: 18px;
+  max-width: 26rem;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ash);
+}
+
+/* Footer: the domain + a round button whose arrow slides through */
+.mk-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.mk-domain {
+  font-size: 14px;
+  color: var(--bone);
+  transition: color 250ms ease;
+}
+.mk-card:hover .mk-domain {
+  color: var(--pom);
+}
+.mk-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--hair-2);
+  overflow: hidden;
+  color: var(--bone);
+  transition:
+    border-color 300ms ease,
+    color 300ms ease,
+    transform 160ms var(--ease-out);
+}
+.mk-btn-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--pom);
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path 450ms var(--ease-out);
+}
+.mk-card:hover .mk-btn {
+  border-color: var(--pom);
+  color: var(--pom-ink);
+}
+.mk-card:hover .mk-btn-fill {
+  clip-path: circle(75% at 50% 50%);
+}
+.mk-card:active .mk-btn {
+  transform: scale(0.94);
+}
+.mk-arr {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  transition: transform 420ms var(--ease-out);
+}
+.mk-arr-in {
+  transform: translate(-130%, 130%);
+}
+.mk-card:hover .mk-arr-out {
+  transform: translate(130%, -130%);
+}
+.mk-card:hover .mk-arr-in {
+  transform: translate(0, 0);
+}
+
+.mk-card:focus-visible {
+  outline: 2px solid var(--pom);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-card:hover .mk-name-wrap[data-in="true"] .mk-l,
+  .mk-card:hover .mk-string {
+    animation: none;
+  }
+  .mk-spot::before {
+    display: none;
+  }
+}

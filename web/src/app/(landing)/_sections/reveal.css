@@ -1,0 +1,38 @@
+/* Scroll reveals (see reveal.tsx). Hidden only once JS has armed the scope ([data-rv-armed]); played once.
+   Animations use fill-mode "backwards" so, once done, they hand transform back to hover styles. */
+
+/* Words rise out of a mask, one after another */
+.rv-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.rv-wi { display: inline-block; }
+[data-rv-armed] [data-rv="words"]:not([data-in]) .rv-wi { transform: translateY(112%); }
+[data-rv-armed] [data-rv="words"][data-in] .rv-wi {
+  animation: rv-word 760ms var(--ease-out) backwards;
+  animation-delay: calc(var(--wi, 0) * 55ms);
+}
+@keyframes rv-word { from { transform: translateY(112%) rotate(3deg); } to { transform: none; } }
+
+/* A block lifts in (stagger with --rv-i on the element) */
+[data-rv-armed] [data-rv="rise"]:not([data-in]) { opacity: 0; }
+[data-rv-armed] [data-rv="rise"][data-in] {
+  animation: rv-rise 620ms var(--ease-out) backwards;
+  animation-delay: calc(var(--rv-i, 0) * 60ms + var(--rv-d, 0ms));
+}
+@keyframes rv-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+/* Children of a group lift in one by one */
+[data-rv-armed] [data-rv="stagger"]:not([data-in]) > * { opacity: 0; }
+[data-rv-armed] [data-rv="stagger"][data-in] > * {
+  animation: rv-rise 560ms var(--ease-out) backwards;
+  animation-delay: calc(var(--rv-i, 0) * 70ms + var(--rv-d, 0ms));
+}
+
+/* Default stagger order for group children */
+[data-rv="stagger"] > :nth-child(2) { --rv-i: 1; }
+[data-rv="stagger"] > :nth-child(3) { --rv-i: 2; }
+[data-rv="stagger"] > :nth-child(4) { --rv-i: 3; }
+[data-rv="stagger"] > :nth-child(5) { --rv-i: 4; }
+[data-rv="stagger"] > :nth-child(6) { --rv-i: 5; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rv-armed] * { animation: none !important; }
+}

@@ -3,6 +3,7 @@ import { q } from "./db";
 import { searchEntities, type EntityFilters } from "./search";
 import { entityUrl } from "./telegram/cards";
 import { env } from "./env";
+import { catalogueData } from "./public-catalogue";
 
 type Row = {
   id: string;
@@ -74,12 +75,14 @@ async function loadRows(workspaceId: string, ids: string[] | null, f: EntityFilt
   );
 }
 
-function itemMd(r: Row, level = 3): string {
+function itemMd(r: Row, level = 3, extra: { copy?: string; loose?: boolean } = {}): string {
   const h = "#".repeat(level);
   const lines = [`${h} ${r.name}`, ""];
   const facts: [string, string | null][] = [
     ["Type", r.kind],
-    ["Link", r.canonical_url ? `${r.canonical_url} (${LINK_LABEL[r.link_status] ?? r.link_status})` : LINK_LABEL[r.link_status] ?? r.link_status],
+    ["Match", extra.loose ? "only similar in meaning (no word or name matched): a suggestion, not an answer" : null],
+    // Drive, Docs and Notion links can be taken down by their owner: give our saved copy first.
+    ["Link", extra.copy ? `${extra.copy} (saved copy; original: ${r.canonical_url})` : r.canonical_url ? `${r.canonical_url} (${LINK_LABEL[r.link_status] ?? r.link_status})` : LINK_LABEL[r.link_status] ?? r.link_status],
     ["Category", r.category],
     ["Pricing", r.pricing],
     ["Creator", r.creator_handle ? `@${r.creator_handle}${r.is_creator_owned ? " (creator's own resource)" : ""}` : null],
@@ -105,24 +108,44 @@ function itemMd(r: Row, level = 3): string {
   return lines.join("\n");
 }
 
+/** One line per item: enough for an agent to choose, with what to call for the rest. */
+function briefMd(r: Row, extra: { copy?: string; loose?: boolean } = {}) {
+  const t = r.summary.replace(/\s+/g, " ").trim();
+  const first = t.split(/(?<=[.!?])\s/)[0];
+  const sum = first.length <= 150 ? first : t.slice(0, 150).replace(/\s+\S*$/, "") + "…";
+  const link = extra.copy ?? r.canonical_url ?? LINK_LABEL[r.link_status] ?? r.link_status;
+  return `- **${r.name}** (${r.kind}${extra.loose ? "; only similar in meaning" : ""}): ${sum} · ${link} · \`${r.slug}\``;
+}
+const approxTokens = (chars: number) => (chars < 4000 ? "under 1k tokens" : `about ${Math.round(chars / 4000)}k tokens`);
+
+/**
+ * The library (or a search, or one item) as Markdown for agents.
+ * detail "brief" (default): one line per item, plus the size of the full version, so the agent can read the list,
+ * then fetch only the items it needs (item=<slug>) or everything in full (detail "full") when that's worth it.
+ */
 export async function libraryMarkdown(
   workspaceId: string,
-  opts: EntityFilters & { q?: string; item?: string } = {},
+  opts: EntityFilters & { q?: string; item?: string; detail?: "brief" | "full" } = {},
 ): Promise<{ markdown: string; count: number }> {
+  const full = opts.detail === "full";
+  const cat = await catalogueData();
+  const copies = new Map(cat.workspaceId === workspaceId ? cat.entries.filter((e) => e.href !== e.url).map((e) => [e.slug, `${env.APP_URL}${e.href}`]) : []);
   if (opts.item) {
     const rows = (await loadRows(workspaceId, null)).filter((r) => r.slug === opts.item || r.id === opts.item);
     if (!rows.length) return { markdown: `# Not found\n\nNo item with slug or id \`${opts.item}\`.\n`, count: 0 };
-    return { markdown: itemMd(rows[0], 1) + "\n", count: 1 };
+    return { markdown: itemMd(rows[0], 1, { copy: copies.get(rows[0].slug) }) + "\n", count: 1 };
   }
 
   let rows: Row[];
   let heading: string;
+  const loose = new Set<string>(); // search results that only matched by meaning
   if (opts.q?.trim()) {
     // Every match, ranked: page through the whole result set.
     const ids: string[] = [];
     for (let offset = 0; ; offset += 50) {
       const page = await searchEntities(workspaceId, opts.q, { ...opts, limit: 50, offset });
       ids.push(...page.items.map((i) => i.id));
+      for (const i of page.items) if (i.matched_by && !i.matched_by.some((m) => m !== "meaning")) loose.add(i.id);
       if (page.next_offset === null) break;
     }
     const byId = new Map((await loadRows(workspaceId, ids)).map((r) => [r.id, r]));
@@ -136,19 +159,37 @@ export async function libraryMarkdown(
   const out = [
     `# ${heading}`,
     "",
-    `${rows.length} ${rows.length === 1 ? "item" : "items"}${opts.q ? ", best matches first" : ", grouped by category"}. This is the complete list${opts.q ? " of matches" : ""}, not a sample.`,
+    `${rows.length} ${rows.length === 1 ? "item" : "items"}${opts.q ? ", best matches first" : ", grouped by category"}. This is the complete list${opts.q ? " of matches" : ""}, not a sample.` +
+      (loose.size === rows.length && rows.length
+        ? " None of them match these words or a name: they're only loosely related in meaning, so treat them as suggestions and say so."
+        : loose.size
+          ? ` The last ${loose.size} only match by meaning (marked "Match: only similar in meaning").`
+          : ""),
     `Generated ${new Date().toISOString()}. Link status "verified" means the link was checked against the official site.`,
     "",
   ];
-  if (opts.q?.trim()) {
-    rows.forEach((r) => out.push(itemMd(r, 2), "", "---", ""));
+  const fullChars = full ? 0 : rows.reduce((n, r) => n + itemMd(r, 3, { copy: copies.get(r.slug) }).length, 0);
+  if (!full && rows.length)
+    out.push(
+      `This is the short list: one line per item (name, what it is, link, slug). For one item in full, ask for item=<slug>. ` +
+        `All ${rows.length} in full would be ${approxTokens(fullChars)} (detail=full); only worth it if you need every detail.`,
+      "",
+    );
+  if (!full && opts.q?.trim()) {
+    rows.forEach((r) => out.push(briefMd(r, { copy: copies.get(r.slug), loose: loose.has(r.id) })));
+  } else if (!full) {
+    const groups = new Map<string, Row[]>();
+    for (const r of rows) groups.set(r.category, [...(groups.get(r.category) ?? []), r]);
+    for (const [c, rs] of groups) out.push(`## ${CATEGORY_TITLE(c)} (${rs.length})`, "", ...rs.map((r) => briefMd(r, { copy: copies.get(r.slug) })), "");
+  } else if (opts.q?.trim()) {
+    rows.forEach((r) => out.push(itemMd(r, 2, { copy: copies.get(r.slug), loose: loose.has(r.id) }), "", "---", ""));
   } else {
     const groups = new Map<string, Row[]>();
     for (const r of rows) groups.set(r.category, [...(groups.get(r.category) ?? []), r]);
     out.push("## Contents", "", ...[...groups].map(([c, rs]) => `- ${CATEGORY_TITLE(c)} (${rs.length})`), "");
     for (const [c, rs] of groups) {
       out.push(`## ${CATEGORY_TITLE(c)}`, "");
-      rs.forEach((r) => out.push(itemMd(r, 3), ""));
+      rs.forEach((r) => out.push(itemMd(r, 3, { copy: copies.get(r.slug) }), ""));
     }
   }
   return { markdown: out.join("\n").trimEnd() + "\n", count: rows.length };

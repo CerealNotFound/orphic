@@ -2,7 +2,8 @@ import { requireKey } from "@/lib/keys";
 import { libraryMarkdown } from "@/lib/agent-markdown";
 
 // Agent mode: the whole library (or the matches for ?q=) as one Markdown document.
-// GET /api/v1/agent.md?q=&category=&tag=&kind=&item=<slug>
+// GET /api/v1/agent.md?q=&category=&tag=&kind=&item=<slug>&detail=brief|full
+// Short list by default (one line per item); item=<slug> or detail=full for everything about each item.
 export async function GET(req: Request) {
   const p = await requireKey(req, "read");
   if (p instanceof Response) return p;
@@ -14,6 +15,7 @@ export async function GET(req: Request) {
     category: opt("category"),
     tag: opt("tag"),
     kind: opt("kind"),
+    detail: opt("detail") === "full" ? "full" : "brief",
   });
   return new Response(markdown, { headers: { "content-type": "text/markdown; charset=utf-8", "x-orphic-count": String(count) } });
 }

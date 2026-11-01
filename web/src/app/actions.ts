@@ -143,7 +143,7 @@ export async function createPasswordAccount(_prev: PasswordAccountState, formDat
     return { error: "Couldn't create the login. Please try again." };
   }
   if (!(await redeemLinkToken(token, userId, email))) return { error: "This link has expired. Send /web to the Orphic bot again." };
-  redirect("/");
+  redirect("/app");
 }
 
 /**
@@ -170,7 +170,7 @@ export async function resetPasswordWithLink(_prev: PasswordAccountState, formDat
   } catch {
     return { error: "Couldn't change the password. Send /web to the bot for a fresh link and try again." };
   }
-  redirect("/");
+  redirect("/app");
 }
 
 /** Ties the signed-in Google account to the teammate who asked the bot for a /web link. */
@@ -180,5 +180,5 @@ export async function connectAccount(formData: FormData) {
   if (!user) redirect(`/connect?token=${encodeURIComponent(token)}`);
   const ok = await redeemLinkToken(token, user.id, user.email);
   if (!ok) redirect(`/connect?token=${encodeURIComponent(token)}&failed=1`);
-  redirect("/");
+  redirect("/app");
 }

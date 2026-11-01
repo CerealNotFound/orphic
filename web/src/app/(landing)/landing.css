@@ -1,0 +1,132 @@
+/* Orphic landing page tokens + shared primitives. See DESIGN.md. Scoped to .lp so the app is unaffected. */
+.lp {
+  --void: #0b0a08;
+  --ink-1: #141210;
+  --ink-2: #1c1915;
+  --hair: rgba(237, 230, 217, 0.09);
+  --hair-2: rgba(237, 230, 217, 0.16);
+  --bone: #ede6d9;
+  --ash: #a39a8c;
+  --dust: #6b6358;
+  --pom: #ff5a36;
+  --pom-ink: #1a0802;
+  --pom-soft: rgba(255, 90, 54, 0.14);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-io: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+.lp ::selection {
+  background: var(--pom-soft);
+  color: var(--bone);
+}
+.lp :focus-visible {
+  outline: 2px solid var(--pom);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.lp-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.lp-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+.lp-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dust);
+}
+.lp-wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+@media (min-width: 768px) {
+  .lp-wrap {
+    padding-inline: 40px;
+  }
+}
+
+/* Buttons */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  background: var(--pom);
+  color: var(--pom-ink);
+  transition:
+    transform 120ms var(--ease-out),
+    background-color 180ms ease;
+  will-change: transform;
+}
+.lp-btn:hover {
+  background: #ff6b4a;
+}
+.lp-btn:active {
+  transform: scale(0.97);
+}
+.lp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--bone);
+  transition: color 180ms ease;
+}
+.lp-link:hover {
+  color: var(--pom);
+}
+.lp-link .lp-arrow {
+  transition: transform 180ms var(--ease-out);
+}
+.lp-link:hover .lp-arrow {
+  transform: translateX(3px);
+}
+
+/* Reveal once on scroll (used sparingly: section headings only) */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(6px);
+  transition:
+    opacity 380ms var(--ease-out),
+    transform 380ms var(--ease-out),
+    filter 380ms var(--ease-out);
+}
+.lp-reveal[data-in="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .lp-reveal {
+    filter: none;
+    transform: none;
+  }
+}

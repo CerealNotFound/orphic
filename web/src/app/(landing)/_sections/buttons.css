@@ -1,0 +1,231 @@
+/* ---------- MagneticButton ---------- */
+.mg {
+  --tx: 0px;
+  --ty: 0px;
+  position: relative;
+  display: inline-flex;
+  border-radius: 999px;
+  background: var(--pom);
+  color: var(--pom-ink);
+  text-decoration: none;
+  transform: translate(var(--tx), var(--ty));
+  transition:
+    transform 500ms var(--ease-out),
+    background-color 200ms ease,
+    box-shadow 300ms ease;
+  will-change: transform;
+}
+.mg:hover {
+  transition:
+    transform 140ms linear,
+    background-color 200ms ease,
+    box-shadow 300ms ease;
+  box-shadow: 0 10px 30px -10px rgba(255, 90, 54, 0.55);
+}
+.mg:active .mg-body {
+  transform: translate(calc(var(--tx) * 0.35), calc(var(--ty) * 0.35)) scale(0.96);
+}
+.mg-body {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  /* content drifts a little further than the button: depth */
+  transform: translate(calc(var(--tx) * 0.35), calc(var(--ty) * 0.35));
+  transition: transform 500ms var(--ease-out);
+}
+.mg:hover .mg-body {
+  transition: transform 140ms linear;
+}
+.mg--lg {
+  height: 52px;
+  padding: 0 7px 0 24px;
+  font-size: 15.5px;
+}
+.mg--sm {
+  height: 38px;
+  padding: 0 5px 0 16px;
+  font-size: 14px;
+}
+
+/* Rolling label: each letter is two stacked copies; hover slides them up, staggered */
+.mg-roll {
+  display: inline-flex;
+  line-height: 1.2;
+}
+.mg-ch {
+  display: inline-flex;
+  flex-direction: column;
+  height: 1.2em;
+  overflow: hidden;
+  white-space: pre;
+}
+.mg-ch > span {
+  display: block;
+  transition: transform 520ms var(--ease-out);
+  transition-delay: calc(var(--i) * 16ms);
+}
+.mg:hover .mg-ch > span {
+  transform: translateY(-100%);
+}
+
+.mg-kbd {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(26, 8, 2, 0.14);
+  color: var(--pom-ink);
+  letter-spacing: 0.02em;
+}
+
+/* Icon chip: dark circle, the icon slides through on hover */
+.mg-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--pom-ink);
+  color: var(--pom);
+  overflow: hidden;
+  transition: transform 400ms var(--ease-out);
+}
+.mg--lg .mg-icon {
+  width: 38px;
+  height: 38px;
+}
+.mg--sm .mg-icon {
+  width: 28px;
+  height: 28px;
+}
+.mg:hover .mg-icon {
+  transform: scale(1.08) rotate(-8deg);
+}
+.mg-i {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  inset: 0;
+  transition: transform 460ms var(--ease-out);
+}
+.mg-i svg {
+  width: 46%;
+  height: 46%;
+}
+.mg-i-in {
+  transform: translateX(-120%);
+}
+.mg:hover .mg-i-out {
+  transform: translateX(120%);
+}
+.mg:hover .mg-i-in {
+  transform: translateX(0);
+}
+
+/* ---------- ScrollCue ---------- */
+.sc {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--bone);
+  font-size: 15px;
+  text-decoration: none;
+}
+.sc-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--hair-2);
+  /* solid, so the hero's background strings don't run through the ring */
+  background: var(--void);
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    border-color 300ms ease,
+    color 300ms ease,
+    transform 160ms var(--ease-out);
+}
+.sc-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--pom);
+  clip-path: circle(0% at 50% 100%);
+  transition: clip-path 500ms var(--ease-out);
+}
+.sc-a {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition: transform 460ms var(--ease-out);
+}
+/* fully outside the ring until hover (a 16px arrow in a 44px ring needs > 30px) */
+.sc-a-in {
+  transform: translateY(-220%);
+}
+/* idle hint: a small drop every few seconds */
+.sc-a-out {
+  animation: sc-bob 3.2s var(--ease-out) 1.6s infinite;
+}
+@keyframes sc-bob {
+  0%, 72%, 100% { transform: translateY(0); }
+  80% { transform: translateY(4px); }
+  88% { transform: translateY(-1px); }
+}
+.sc:hover .sc-ring {
+  border-color: var(--pom);
+  color: var(--pom-ink);
+}
+.sc:hover .sc-fill {
+  clip-path: circle(80% at 50% 100%);
+}
+.sc:hover .sc-a-out {
+  animation: none;
+  transform: translateY(220%);
+}
+.sc:hover .sc-a-in {
+  transform: translateY(0);
+}
+.sc:active .sc-ring {
+  transform: scale(0.94);
+}
+.sc-label {
+  position: relative;
+}
+.sc { position: relative; z-index: 1; }
+.sc-label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--pom);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 450ms var(--ease-out);
+}
+.sc:hover .sc-label::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.sc:focus-visible .sc-ring,
+.mg:focus-visible {
+  outline: 2px solid var(--pom);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mg,
+  .mg-body {
+    transform: none !important;
+  }
+  .mg-ch > span {
+    transition: none;
+  }
+  .mg:hover .mg-ch > span {
+    transform: none;
+  }
+}

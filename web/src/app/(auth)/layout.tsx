@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">

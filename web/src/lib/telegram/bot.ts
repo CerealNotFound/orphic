@@ -257,7 +257,7 @@ export function createBot() {
 async function replySearch(ctx: Ctx, query: string, offset = 0) {
   const page = await searchEntities(ctx.member!.workspace_id, query, { limit: 5, offset });
   const kb = searchKeyboard(query, page);
-  if (isPublicUrl(env.APP_URL) && page.total > 0) kb.row().url("🌐 Open in Orphic", `${env.APP_URL}/?q=${encodeURIComponent(query)}`);
+  if (isPublicUrl(env.APP_URL) && page.total > 0) kb.row().url("🌐 Open in Orphic", `${env.APP_URL}/app?q=${encodeURIComponent(query)}`);
   const hasButtons = kb.inline_keyboard.some((row) => row.length > 0);
   await ctx.reply(searchResults(query, page), { parse_mode: "HTML", reply_markup: hasButtons ? kb : undefined, link_preview_options: { is_disabled: true } });
 }

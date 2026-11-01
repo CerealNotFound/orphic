@@ -37,11 +37,11 @@ async function Tool({ params }: { params: PageProps<"/tools/[slug]">["params"] }
   return (
     <div>
       <nav aria-label="Breadcrumb" className="mb-5 text-sm text-subtle">
-        <Link href="/" className="hover:text-ink">
+        <Link href="/app" className="hover:text-ink">
           Search
         </Link>
         <span aria-hidden="true"> / </span>
-        <Link href={`/?category=${encodeURIComponent(entity.category)}`} className="hover:text-ink">
+        <Link href={`/app?category=${encodeURIComponent(entity.category)}`} className="hover:text-ink">
           {humanize(entity.category)}
         </Link>
       </nav>
@@ -56,7 +56,7 @@ async function Tool({ params }: { params: PageProps<"/tools/[slug]">["params"] }
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-subtle">
                 <span>{humanize(entity.kind)}</span>
                 <span aria-hidden="true">·</span>
-                <Link href={`/?category=${encodeURIComponent(entity.category)}`} className="hover:text-ink">
+                <Link href={`/app?category=${encodeURIComponent(entity.category)}`} className="hover:text-ink">
                   {humanize(entity.category)}
                 </Link>
                 {entity.pricing && (
@@ -115,7 +115,7 @@ async function Tool({ params }: { params: PageProps<"/tools/[slug]">["params"] }
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="mr-1 text-xs font-medium text-subtle">Tags</span>
                   {entity.tags.map((t) => (
-                    <TagChip key={t} tag={t} href={`/?tag=${encodeURIComponent(t)}`} />
+                    <TagChip key={t} tag={t} href={`/app?tag=${encodeURIComponent(t)}`} />
                   ))}
                 </div>
               )}

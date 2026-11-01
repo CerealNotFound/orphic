@@ -37,7 +37,7 @@ Orphic is open source (MIT). **Each deployment is one team.** You run your own c
 - **Use it from anywhere:**
   - the Telegram bot (`@yourbot query` in any chat),
   - the web app (email + password),
-  - Claude Code / Cursor / Gemini CLI over MCP,
+  - Claude Code / Cursor / Gemini CLI over MCP (team: `/api/mcp` with a key; open catalogue: `/api/public/mcp`, no key),
   - a REST API.
 
 ## How it works
@@ -53,7 +53,7 @@ Orphic is open source (MIT). **Each deployment is one team.** You run your own c
              driven by a Claude Code session that identifies and verifies each item
 ```
 
-- **`web/`**: one Next.js 16 app. It holds the bot webhook, the web UI, the MCP server (`/api/mcp`), the REST API (`/api/v1`), the worker API and the scheduled jobs.
+- **`web/`**: one Next.js 16 app. It holds the bot webhook, the web UI, the MCP servers (`/api/mcp` for the team, `/api/public/mcp` for the open catalogue), the REST API (`/api/v1`), the worker API and the scheduled jobs.
 - **`web/worker/`**: the worker CLI (`pnpm worker …`).
   - It runs on a machine you own, because Instagram blocks downloads from cloud servers.
   - It uses `yt-dlp`, `ffmpeg` and `whisper-cli`. No Python, no ML libraries.

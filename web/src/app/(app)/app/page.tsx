@@ -30,7 +30,7 @@ function buildHref(base: Params, patch: Partial<Params>) {
   const sp = new URLSearchParams();
   for (const [k, v] of Object.entries(merged)) if (v) sp.set(k, v);
   const s = sp.toString();
-  return s ? `/?${s}` : "/";
+  return s ? `/app?${s}` : "/app";
 }
 
 async function Home({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
@@ -171,7 +171,7 @@ async function Home({ searchParams }: { searchParams: PageProps<"/">["searchPara
               {p.q || hasFilters ? (
                 <>
                   Try fewer words or{" "}
-                  <Link href="/" className="font-medium text-accent underline underline-offset-4">
+                  <Link href="/app" className="font-medium text-accent underline underline-offset-4">
                     clear filters
                   </Link>
                   .

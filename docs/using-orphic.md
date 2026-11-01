@@ -139,11 +139,36 @@ Then ask Claude things like "what do we have in Orphic for anime videos?" It can
 
 **Cursor** (`~/.cursor/mcp.json`) / **Gemini CLI** (`settings.json`): the exact snippets are on the Connect AI page.
 
-**Any agent or script (agent mode):** the whole library as one Markdown document.
+**Any agent or script (agent mode):** the library as Markdown. By default a short list (one line per item, with the size of the full version), so an agent reads the list first and fetches only what it needs.
 ```bash
-curl -H "Authorization: Bearer <key>" https://<your-orphic>/api/v1/agent.md            # everything
-curl -H "Authorization: Bearer <key>" "https://<your-orphic>/api/v1/agent.md?q=anime"  # matches only
+curl -H "Authorization: Bearer <key>" https://<your-orphic>/api/v1/agent.md                    # everything, one line each
+curl -H "Authorization: Bearer <key>" "https://<your-orphic>/api/v1/agent.md?q=anime"          # matches only
+curl -H "Authorization: Bearer <key>" "https://<your-orphic>/api/v1/agent.md?item=<slug>"      # one item in full
+curl -H "Authorization: Bearer <key>" "https://<your-orphic>/api/v1/agent.md?detail=full"      # every item in full (large)
 ```
+The MCP tool `read_library` works the same way (`detail: "full"` for everything).
 Point an agent at `https://<your-orphic>/llms.txt`; it explains the API to the agent.
+
+Search results say how each item matched (`matched_by`: words, name or meaning). When nothing matches the words or a name, the AI is told the results are only loosely related, so it doesn't present them as answers. Drive, Google Docs and Notion links come with the saved copy, since their owner can take the original down.
+
+### The open catalogue (no key)
+
+Agents without MCP can read the catalogue as Markdown pages laid out as a map, each saying what the next step costs:
+
+| Page | What it holds |
+|---|---|
+| `/llms.txt` | Start here: every way in and its size |
+| `/explore.md` | Categories, counts, top tools |
+| `/explore/category/{category}.md` | One line per tool |
+| `/explore/{slug}.md` | One tool in full (with its saved files, if any) |
+| `/llms-full.txt`, `/catalogue.json` | Everything in one request |
+
+Asking for Markdown on a normal page (`Accept: text/markdown`) returns the Markdown version too. All of these are prebuilt and cached, so they cost nothing to serve.
+
+Anyone can connect an AI to the public part of the catalogue, with no key or account:
+```bash
+claude mcp add --transport http orphic https://<your-orphic>/api/public/mcp
+```
+Tools: `search_tools`, `get_tool`, `list_tools` (one call can list the whole catalogue), `list_categories`. It's read-only, costs nothing per call (no AI or embedding calls), and `PUBLIC_API=off` pauses it along with the public search API.
 
 Keep your key private: anyone with it can read your team's library. If it leaks, ask an admin to remove and re-invite you, which revokes your keys.

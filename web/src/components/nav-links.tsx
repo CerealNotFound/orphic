@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 export const NAV = [
-  { href: "/", label: "Search" },
+  { href: "/app", label: "Search" },
   { href: "/pending", label: "Pending" },
   { href: "/team", label: "Team" },
   { href: "/connect-ai", label: "Connect AI" },
@@ -12,7 +12,7 @@ export const NAV = [
 
 export function NavLinks({ badges }: { badges?: Partial<Record<string, ReactNode>> }) {
   const pathname = usePathname();
-  return <NavList active={(href) => (href === "/" ? pathname === "/" || pathname.startsWith("/tools") : pathname.startsWith(href))} badges={badges} />;
+  return <NavList active={(href) => (href === "/app" ? pathname === "/app" || pathname.startsWith("/tools") : pathname.startsWith(href))} badges={badges} />;
 }
 
 export function NavList({ active, badges }: { active?: (href: string) => boolean; badges?: Partial<Record<string, ReactNode>> }) {

@@ -6,6 +6,10 @@ import { Avatar, Logo } from "@/components/ui";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { currentMember, openTaskCount } from "@/lib/ui-data";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <>
@@ -14,7 +18,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       </a>
       <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/70">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 sm:flex-nowrap sm:px-6">
-          <Link href="/" className="rounded-lg py-1" aria-label="Orphic home">
+          <Link href="/app" className="rounded-lg py-1" aria-label="Orphic home">
             <Logo className="text-lg" />
           </Link>
           <nav aria-label="Main" className="order-3 -mx-2 w-full sm:order-none sm:mx-0 sm:w-auto">

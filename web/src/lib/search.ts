@@ -34,9 +34,19 @@ export type EntityHit = {
   savers: string[];
   updated_at: string;
   score?: number;
+  /** Search only: why it matched. "meaning" alone means no word or name in the question matched it. */
+  matched_by?: ("words" | "name" | "meaning")[];
 };
 
-export type Page<T> = { total: number; items: T[]; offset: number; limit: number; next_offset: number | null };
+export type Page<T> = {
+  total: number;
+  items: T[];
+  offset: number;
+  limit: number;
+  next_offset: number | null;
+  /** Search only: how many of `total` matched a word or the name (the rest are only similar in meaning). */
+  strong_total?: number;
+};
 
 const RRF_K = 60;
 // Vector neighbours count as "matches" only above this cosine similarity (tune with the golden set).
@@ -73,6 +83,9 @@ const GENERIC_WORDS = [
   "tool", "best", "app", "ai", "use", "make", "help", "good", "free", "websit", "site", "thing", "someth", "want", "need",
   "find", "show", "way", "anyth", "can", "get", "like", "one", "realli", "top", "list", "everyth", "save", "orphic", "remember",
   "rememb", "saw", "seen", "reel", "post", "link",
+  // Filler that says nothing about the tool ("nothing like this", "any cool stuff", "please suggest something").
+  "noth", "stuff", "kind", "similar", "lot", "look", "tri", "pleas", "mayb", "just", "also", "actual", "recommend", "suggest",
+  "give", "know", "tell", "cool", "great", "awesom", "nice", "anyon", "someon", "els", "sort", "type",
 ];
 const GENERIC_SQL = `array[${GENERIC_WORDS.map((w) => `'${w}'`).join(",")}]`;
 
@@ -121,10 +134,12 @@ export async function searchEntities(
   opts: EntityFilters & { limit?: number; offset?: number } = {},
 ): Promise<Page<EntityHit>> {
   // Strict first (precise counts); if that finds almost nothing, loosen so nothing relevant is missed.
+  // Only word or name matches count here: items that are merely similar in meaning don't prove the search worked.
   const strict = await runSearch(workspaceId, query, opts, true);
-  if (strict.total >= 3 || !query.trim()) return strict;
+  const strong = (p: Page<EntityHit>) => p.strong_total ?? p.total;
+  if (strong(strict) >= 3 || !query.trim()) return strict;
   const loose = await runSearch(workspaceId, query, opts, false);
-  return loose.total > strict.total ? loose : strict;
+  return strong(loose) > strong(strict) ? loose : strict;
 }
 
 async function runSearch(
@@ -157,7 +172,7 @@ async function runSearch(
       order by ee.embedding <=> ${v} limit ${CANDIDATES})`;
   }
   params.push(limit, offset);
-  const rows = await q<EntityHit & { total: string; score: number }>(
+  const rows = await q<EntityHit & { total: string; strong_total: string; score: number }>(
     `with qlex as (
        select distinct lexeme from unnest(to_tsvector('english', $2)) where lexeme <> all(${GENERIC_SQL})),
      corpus as (select count(*)::float as n from entities where workspace_id = $1),
@@ -195,19 +210,28 @@ async function runSearch(
        where sim >= ${trigramMin} order by sim desc limit ${CANDIDATES}),
      ${vecCte},
      fused as (
-       select id, sum(w / (${RRF_K} + rnk)) as score from (
-         select id, rnk, 1.0 as w from fts
-         union all select id, rnk, case when sim >= 0.8 then 2.0 else 0.6 end as w from trg
-         union all select id, rnk, 1.0 as w from vec) x
+       select id, sum(w / (${RRF_K} + rnk)) as score,
+              array_remove(array[case when bool_or(src = 'fts') then 'words' end,
+                                 case when bool_or(src = 'trg') then 'name' end,
+                                 case when bool_or(src = 'vec') then 'meaning' end], null) as matched_by,
+              bool_or(src <> 'vec') as strong
+       from (
+         select id, rnk, 1.0 as w, 'fts' as src from fts
+         union all select id, rnk, case when sim >= 0.8 then 2.0 else 0.6 end as w, 'trg' from trg
+         union all select id, rnk, 1.0 as w, 'vec' from vec) x
        group by id)
-     select ${SELECT_HIT}, f.score, count(*) over () as total
+     -- Items that match a word or the name always rank above items that are only similar in meaning.
+     select ${SELECT_HIT}, f.score, f.matched_by, count(*) over () as total,
+            count(*) filter (where f.strong) over () as strong_total
      from fused f join entities e on e.id = f.id
-     order by f.score desc, e.save_count desc, e.rating_score desc
+     order by f.strong desc, f.score desc, e.save_count desc, e.rating_score desc
      limit $${params.length - 1} offset $${params.length}`,
     params,
   );
   const total = rows.length ? Number(rows[0].total) : 0;
-  return page(rows, total, offset, limit);
+  const strong = rows.length ? Number(rows[0].strong_total) : 0;
+  for (const r of rows) delete (r as { strong_total?: string }).strong_total;
+  return { ...page(rows, total, offset, limit), strong_total: strong };
 }
 
 function page<T extends { total?: string }>(rows: T[], total: number, offset: number, limit: number): Page<Omit<T, "total">> {

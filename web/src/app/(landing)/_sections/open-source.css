@@ -1,0 +1,22 @@
+/* Open source: entrance (see reveal.tsx). The clone line types out; the repo card prints its stack like a terminal. */
+.os-clone { display: inline-flex; align-items: center; }
+.os-caret { display: inline-block; width: 7px; height: 14px; margin-left: 3px; background: var(--pom); opacity: 0; }
+[data-rv-armed] [data-rv][data-in] .os-clone-text {
+  display: inline-block; white-space: nowrap;
+  animation: os-type calc(var(--n, 40) * 26ms) steps(var(--n, 40)) 520ms backwards;
+}
+[data-rv-armed] [data-rv][data-in] .os-caret { animation: os-caret 700ms steps(1) 520ms 4; }
+@keyframes os-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes os-caret { 0% { opacity: 1; } 50% { opacity: 0; } }
+
+[data-rv-armed] .os-card[data-rv]:not([data-in]) { opacity: 0; }
+[data-rv-armed] .os-card[data-rv][data-in] { animation: os-card 720ms var(--ease-out) 80ms backwards; }
+@keyframes os-card { from { opacity: 0; transform: translateY(26px) rotate(-0.6deg); } to { opacity: 1; transform: none; } }
+[data-rv-armed] .os-card[data-rv]:not([data-in]) .os-line { opacity: 0; }
+[data-rv-armed] .os-card[data-rv][data-in] .os-line {
+  animation: os-line 380ms var(--ease-out) backwards;
+  animation-delay: calc(var(--rv-i, 0) * 90ms + 460ms);
+}
+@keyframes os-line { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+[data-rv-armed] .os-card[data-rv][data-in] .os-line dt { animation: os-key 900ms ease-out backwards; animation-delay: calc(var(--rv-i, 0) * 90ms + 460ms); }
+@keyframes os-key { from { text-shadow: 0 0 12px rgba(255, 90, 54, 0.9); } to { text-shadow: none; } }

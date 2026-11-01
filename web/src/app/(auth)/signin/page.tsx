@@ -35,7 +35,7 @@ async function SignIn({ searchParams }: { searchParams: PageProps<"/signin">["se
           Signed in as <span className="font-medium text-ink">{viewer.member.display_name}</span>
           {viewer.email && <> ({viewer.email})</>}.
         </p>
-        <Link href="/" className={`${btn.primary} mt-6 w-full`}>
+        <Link href="/app" className={`${btn.primary} mt-6 w-full`}>
           Open Orphic →
         </Link>
       </div>
@@ -70,11 +70,11 @@ async function SignIn({ searchParams }: { searchParams: PageProps<"/signin">["se
         link and who tried it.
       </p>
       <div className="mt-6">
-        <EmailSignInForm callbackURL="/" />
+        <EmailSignInForm callbackURL="/app" />
       </div>
       {configured && (
         <div className="mt-4">
-          <GoogleSignInButton callbackURL="/" />
+          <GoogleSignInButton callbackURL="/app" />
         </div>
       )}
       <p className="mt-6 text-xs leading-relaxed text-subtle">

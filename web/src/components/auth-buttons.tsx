@@ -6,7 +6,7 @@ import { authClient } from "@/lib/auth-client";
 const primary =
   "inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-ink px-5 py-3 text-sm font-medium text-canvas shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
 
-export function GoogleSignInButton({ callbackURL = "/", disabled }: { callbackURL?: string; disabled?: boolean }) {
+export function GoogleSignInButton({ callbackURL = "/app", disabled }: { callbackURL?: string; disabled?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
@@ -62,7 +62,7 @@ export function SignOutButton({ className, children = "Sign out" }: { className?
 const field =
   "h-11 w-full rounded-xl border border-line bg-card px-3.5 text-sm text-ink placeholder:text-subtle/70 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15";
 
-export function EmailSignInForm({ callbackURL = "/" }: { callbackURL?: string }) {
+export function EmailSignInForm({ callbackURL = "/app" }: { callbackURL?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

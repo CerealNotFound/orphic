@@ -1,0 +1,685 @@
+.hiw {
+  padding-block: 88px;
+}
+@media (min-width: 1024px) {
+  .hiw {
+    padding-block: 128px 96px;
+  }
+}
+.hiw-title {
+  margin-top: 20px;
+  max-width: 14ch;
+  font-size: clamp(40px, 7vw, 72px);
+}
+
+.hiw-grid {
+  margin-top: 56px;
+  display: block;
+}
+
+/* Steps */
+.hiw-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hiw-step {
+  padding-block: 36px 40px;
+  border-top: 1px solid var(--hair);
+}
+.hiw-step-body {
+  display: grid;
+  gap: 10px;
+  max-width: 440px;
+}
+.hiw-num {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--pom);
+}
+.hiw-step-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+.hiw-step-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ash);
+}
+
+/* Frames: shared */
+.hiw-inline {
+  position: relative;
+  height: 320px;
+  margin-top: 28px;
+  border-radius: 20px;
+  background: var(--ink-1);
+  border: 1px solid var(--hair);
+  overflow: hidden;
+}
+.hiw-frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.hiw-stage {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hiw-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 72px;
+    align-items: start;
+  }
+  .hiw-step {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    padding-block: 0;
+    border-top: 0;
+  }
+  .hiw-step-text,
+  .hiw-step-title {
+    transition: color 300ms ease;
+  }
+  .hiw-num {
+    transition: opacity 300ms ease;
+  }
+  .hiw-step[data-active="false"] .hiw-step-title,
+  .hiw-step[data-active="false"] .hiw-step-text {
+    color: var(--dust);
+  }
+  .hiw-step[data-active="false"] .hiw-num {
+    opacity: 0.45;
+  }
+  .hiw-inline {
+    display: none;
+  }
+  .hiw-stage {
+    display: block;
+    position: sticky;
+    top: 15vh;
+    height: 70vh;
+    min-height: 420px;
+  }
+  .hiw-panel {
+    position: relative;
+    height: 100%;
+    border-radius: 20px;
+    background: var(--ink-1);
+    border: 1px solid var(--hair);
+    overflow: hidden;
+  }
+  .hiw-frame {
+    padding: 40px;
+  }
+  .hiw-frame--stage {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    filter: blur(4px);
+    pointer-events: none;
+    transition:
+      opacity 450ms var(--ease-out),
+      transform 450ms var(--ease-out),
+      filter 450ms var(--ease-out);
+  }
+  .hiw-frame--stage[data-on="true"] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Screen 1: chat */
+.hiw-chat {
+  width: 100%;
+  max-width: 400px;
+  display: grid;
+  gap: 12px;
+}
+.hiw-chat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--hair);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bone);
+}
+.hiw-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--pom-soft);
+  color: var(--pom);
+  font-size: 12px;
+}
+.hiw-msg {
+  max-width: 86%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  border: 1px solid var(--hair);
+  background: var(--ink-2);
+  color: var(--bone);
+}
+.hiw-msg--out {
+  justify-self: end;
+  border-bottom-right-radius: 5px;
+  border-color: var(--hair-2);
+}
+.hiw-msg--in {
+  justify-self: start;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border-bottom-left-radius: 5px;
+  opacity: 0;
+  transform: translateY(8px);
+}
+.hiw-linkpill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--bone);
+}
+.hiw-linkpill svg {
+  color: var(--ash);
+  flex: none;
+}
+.hiw-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--pom);
+}
+[data-on="true"] .hiw-msg--in {
+  animation: hiw-land 450ms var(--ease-out) 500ms forwards;
+}
+[data-on="true"] .hiw-dot {
+  animation: hiw-pulse 700ms ease-in-out 950ms 2;
+}
+@keyframes hiw-land {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hiw-pulse {
+  50% {
+    opacity: 0.25;
+    transform: scale(0.7);
+  }
+}
+
+/* Screen 2: contact sheet */
+.hiw-decode {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.hiw-sheet-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.hiw-sheet {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+}
+.hiw-tile {
+  position: relative;
+  border-radius: 6px;
+  background:
+    linear-gradient(var(--hair-2), var(--hair-2)) 14% 74% / var(--a) 3px no-repeat,
+    linear-gradient(var(--hair), var(--hair)) 14% 86% / var(--b) 3px no-repeat,
+    linear-gradient(var(--hair), var(--hair)) 14% 20% / 30% 12% no-repeat, var(--ink-2);
+  border: 1px solid var(--hair);
+}
+.hiw-tile::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 6px;
+  border: 1.5px solid var(--pom);
+  opacity: 0;
+}
+[data-on="true"] .hiw-tile[data-hit="true"]::after {
+  animation: hiw-show 300ms var(--ease-out) 1.4s forwards;
+}
+.hiw-tag {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: -9px;
+  translate: -50% 0;
+  max-width: 150px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--void);
+  border: 1px solid var(--pom);
+  color: var(--bone);
+  font-size: 10px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+}
+[data-on="true"] .hiw-tag {
+  animation: hiw-show 300ms var(--ease-out) 1.4s forwards;
+}
+.hiw-scanclip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  pointer-events: none;
+}
+.hiw-scan {
+  position: absolute;
+  inset: 0;
+  border-bottom: 1.5px solid var(--pom);
+  background: linear-gradient(to bottom, transparent, var(--pom-soft));
+  transform: translateY(-101%);
+}
+[data-on="true"] .hiw-scan {
+  animation: hiw-sweep 1.4s var(--ease-io) forwards;
+}
+.hiw-caption {
+  margin: 0;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--dust);
+}
+@keyframes hiw-sweep {
+  0% {
+    transform: translateY(-101%);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+@keyframes hiw-show {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Screen 3: terminal */
+.hiw-term {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 12px;
+  background: var(--ink-2);
+  border: 1px solid var(--hair);
+  overflow: hidden;
+}
+.hiw-term-head {
+  padding: 10px 16px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dust);
+  border-bottom: 1px solid var(--hair);
+}
+.hiw-term-body {
+  display: grid;
+  gap: 9px;
+  padding: 16px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--bone);
+}
+.hiw-line {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(4px);
+}
+.hiw-line--dim {
+  color: var(--ash);
+}
+.hiw-k {
+  color: var(--ash);
+}
+[data-on="true"] .hiw-line {
+  animation: hiw-land 380ms var(--ease-out) calc(250ms + var(--i) * 120ms) forwards;
+}
+.hiw-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  padding: 0 11px 0 9px;
+  border-radius: 999px;
+  background: var(--pom-soft);
+  color: var(--pom);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+/* Screen 4: search */
+.hiw-ask {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  gap: 14px;
+  align-self: center;
+}
+.hiw-input {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 48px;
+  padding: 14px 14px;
+  border-radius: 10px;
+  background: var(--ink-2);
+  border: 1px solid var(--hair-2);
+  color: var(--ash);
+}
+.hiw-input svg {
+  flex: none;
+  margin-top: 2px;
+}
+.hiw-typed {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--bone);
+}
+.hiw-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--pom);
+  animation: hiw-blink 1s steps(1) infinite;
+}
+@keyframes hiw-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.hiw-result {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--ink-2);
+  border: 1px solid var(--hair);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+.hiw-result[data-in="true"] {
+  opacity: 1;
+  transform: none;
+}
+.hiw-result-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hiw-result-name {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--bone);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hiw-result-domain {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--dust);
+}
+.hiw-result-sum {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ash);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Reduced motion: final states, no sequencing */
+@media (prefers-reduced-motion: reduce) {
+  .hiw *,
+  .hiw *::before,
+  .hiw *::after {
+    animation: none !important;
+    transition-delay: 0s !important;
+  }
+  .hiw-msg--in,
+  .hiw-line,
+  .hiw-tag,
+  .hiw-result[data-in] {
+    opacity: 1;
+    transform: none;
+  }
+  .hiw-tile[data-hit="true"]::after {
+    opacity: 1;
+  }
+  .hiw-scan {
+    opacity: 0;
+  }
+  .hiw-frame--stage {
+    filter: none;
+    transform: none;
+  }
+}
+
+/* ---------- desktop rail: all steps visible, a progress string, the active step opens ---------- */
+.hiw-rail {
+  display: none;
+}
+@media (min-width: 1024px) {
+  /* Rail and scroll triggers share one grid cell: the rail sticks while the (invisible) steps scroll past. */
+  .hiw-left {
+    display: grid;
+  }
+  .hiw-left > .hiw-rail,
+  .hiw-left > .hiw-steps {
+    grid-area: 1 / 1;
+  }
+  .hiw-rail {
+    display: block;
+    align-self: start;
+    position: sticky;
+    top: 16vh;
+    padding-left: 34px;
+    z-index: 1;
+  }
+  /* The step list below is now only the scroll trigger on desktop. */
+  .hiw-steps .hiw-step-body {
+    visibility: hidden;
+  }
+  .hiw-step {
+    min-height: 56vh !important;
+  }
+  .hiw-rail-track {
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 10px;
+    width: 1.5px;
+    background: var(--hair-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .hiw-rail-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--pom);
+    transform-origin: top;
+    transition: transform 700ms var(--ease-io);
+  }
+  .hiw-rail-step {
+    position: relative;
+    padding: 14px 0;
+  }
+  .hiw-rail-dot {
+    position: absolute;
+    left: -34px;
+    top: 24px;
+    width: 13px;
+    height: 13px;
+    border-radius: 99px;
+    background: var(--void);
+    border: 1.5px solid var(--hair-2);
+    transition:
+      border-color 300ms ease,
+      background-color 300ms ease,
+      transform 400ms var(--ease-out);
+  }
+  .hiw-rail-step[data-done="true"] .hiw-rail-dot {
+    border-color: var(--pom);
+    background: var(--pom);
+    transform: scale(0.7);
+  }
+  .hiw-rail-step[data-active="true"] .hiw-rail-dot {
+    border-color: var(--pom);
+    background: var(--void);
+    box-shadow: 0 0 0 5px var(--pom-soft);
+    transform: scale(1.15);
+  }
+  .hiw-rail-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .hiw-rail-num {
+    font-size: 12px;
+    color: var(--dust);
+    transition: color 300ms ease;
+  }
+  .hiw-rail-step[data-active="true"] .hiw-rail-num {
+    color: var(--pom);
+  }
+  .hiw-rail-title {
+    font-size: 30px;
+    line-height: 1;
+    color: var(--dust);
+    transform-origin: left center;
+    transition:
+      color 300ms ease,
+      transform 500ms var(--ease-out);
+  }
+  .hiw-rail-step[data-active="true"] .hiw-rail-title {
+    color: var(--bone);
+    transform: scale(1.6);
+  }
+  .hiw-rail-step[data-done="true"] .hiw-rail-title {
+    color: var(--ash);
+  }
+  .hiw-rail-more {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 550ms var(--ease-io),
+      opacity 400ms ease;
+  }
+  .hiw-rail-more > div {
+    overflow: hidden;
+  }
+  .hiw-rail-step[data-active="true"] .hiw-rail-more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .hiw-rail-step[data-active="true"] .hiw-rail-head {
+    margin-bottom: 4px;
+  }
+  .hiw-rail-text {
+    margin-top: 22px;
+    max-width: 30rem;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ash);
+  }
+  .hiw-rail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+    padding-bottom: 6px;
+  }
+  .hiw-rail-chips li {
+    list-style: none;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--hair-2);
+    color: var(--bone);
+    background: var(--ink-1);
+  }
+}
+
+/* ---------- entrance (see reveal.tsx) ---------- */
+@media (min-width: 1024px) {
+  /* The string is drawn down the rail, then each step settles in. */
+  [data-rv-armed] .hiw-rail[data-rv]:not([data-in]) .hiw-rail-track { clip-path: inset(0 0 100% 0); }
+  [data-rv-armed] .hiw-rail[data-rv]:not([data-in]) .hiw-rail-step { opacity: 0; }
+  [data-rv-armed] .hiw-rail[data-rv][data-in] .hiw-rail-track { animation: hiw-string 1000ms var(--ease-io) backwards; }
+  [data-rv-armed] .hiw-rail[data-rv][data-in] .hiw-rail-step {
+    animation: hiw-step-in 620ms var(--ease-out) backwards;
+    animation-delay: calc(var(--rv-i, 0) * 120ms + 160ms);
+  }
+  @keyframes hiw-string { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes hiw-step-in { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+
+  /* The screen powers on: opens from a narrower window, a line of light runs down it. */
+  .hiw-panel::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%; pointer-events: none; z-index: 3; opacity: 0;
+    background: linear-gradient(to bottom, transparent, rgba(255, 90, 54, 0.10) 70%, rgba(255, 90, 54, 0.55) 99%, transparent);
+  }
+  [data-rv-armed] .hiw-panel[data-rv]:not([data-in]) { opacity: 0; clip-path: inset(18% 10% 18% 10% round 20px); }
+  [data-rv-armed] .hiw-panel[data-rv][data-in] { animation: hiw-on 900ms var(--ease-out) 120ms backwards; }
+  [data-rv-armed] .hiw-panel[data-rv][data-in]::after { animation: hiw-sweep 1000ms var(--ease-io) 380ms backwards; }
+  @keyframes hiw-on {
+    from { opacity: 0; clip-path: inset(18% 10% 18% 10% round 20px); transform: scale(0.97); }
+    35% { opacity: 1; }
+    to { opacity: 1; clip-path: inset(0 0 0 0 round 20px); transform: none; }
+  }
+  @keyframes hiw-sweep { from { opacity: 1; transform: translateY(-100%); } 85% { opacity: 1; } to { opacity: 0; transform: translateY(340%); } }
+}

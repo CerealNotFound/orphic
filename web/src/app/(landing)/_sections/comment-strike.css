@@ -1,0 +1,213 @@
+.cs-section {
+  position: relative;
+  background: var(--void);
+  border-top: 1px solid var(--hair);
+  padding-block: 80px;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .cs-section {
+    padding-block: 120px;
+  }
+}
+
+.cs-head {
+  display: grid;
+  gap: 28px;
+}
+.cs-title {
+  margin: 0;
+  font-size: clamp(44px, 9vw, 96px);
+  color: var(--bone);
+  max-width: 14ch;
+}
+.cs-title em {
+  font-style: normal;
+  color: var(--pom);
+}
+.cs-sub {
+  margin: 0;
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ash);
+}
+@media (min-width: 768px) {
+  .cs-sub {
+    font-size: 20px;
+  }
+}
+
+/* Marquee */
+.cs-marquee {
+  margin-top: 64px;
+  display: grid;
+  gap: 12px;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+@media (min-width: 768px) {
+  .cs-marquee {
+    margin-top: 88px;
+    gap: 20px;
+  }
+}
+.cs-row {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: cs-scroll var(--cs-dur, 55s) linear infinite;
+}
+.cs-row[data-dir="rev"] {
+  animation-direction: reverse;
+}
+.cs-group {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+.cs-phrase {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(48px, 10vw, 120px);
+  line-height: 1.05;
+  color: var(--bone);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.cs-phrase::after {
+  content: "";
+  position: absolute;
+  left: -0.04em;
+  right: -0.04em;
+  top: 52%;
+  height: 4px;
+  margin-top: -2px;
+  background: var(--pom);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out);
+  /* after the rows have spread open */
+  transition-delay: calc(var(--i, 0) * 60ms + 420ms);
+}
+@media (max-width: 767px) {
+  .cs-phrase::after {
+    height: 3px;
+    margin-top: -1.5px;
+  }
+}
+.cs-section[data-in="true"] .cs-phrase::after {
+  transform: scaleX(1);
+}
+.cs-sep {
+  flex-shrink: 0;
+  width: 0.16em;
+  height: 0.16em;
+  margin-inline: clamp(24px, 4vw, 56px);
+  border-radius: 999px;
+  background: var(--pom);
+  font-size: clamp(48px, 10vw, 120px);
+}
+
+@keyframes cs-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Entrance: each row spreads open from the centre, like a string drawn wide, then the strikes land. */
+[data-rv-armed] .cs-marquee[data-rv]:not([data-in]) .cs-row-wrap { opacity: 0; clip-path: inset(0 50% 0 50%); }
+[data-rv-armed] .cs-marquee[data-rv][data-in] .cs-row-wrap {
+  animation: cs-spread 900ms var(--ease-out) backwards;
+  animation-delay: calc(var(--ri, 0) * 110ms);
+}
+@keyframes cs-spread {
+  from { opacity: 0; clip-path: inset(0 50% 0 50%); transform: scaleY(0.7); }
+  40% { opacity: 1; }
+  to { opacity: 1; clip-path: inset(0 0 0 0); transform: none; }
+}
+
+/* Stat */
+.cs-stat {
+  margin-top: 72px;
+  display: grid;
+  gap: 24px;
+  align-items: end;
+  border-top: 1px solid var(--hair);
+  padding-top: 40px;
+}
+@media (min-width: 768px) {
+  .cs-stat {
+    margin-top: 104px;
+    grid-template-columns: 7fr 5fr;
+    gap: 48px;
+    padding-top: 56px;
+  }
+}
+/* Entrance: a pomegranate rule sweeps along the top edge, then settles into the hairline. */
+.cs-stat { position: relative; }
+.cs-stat::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--pom);
+  transform: scaleX(0); transform-origin: left; opacity: 0; pointer-events: none;
+}
+[data-rv-armed] .cs-stat[data-rv][data-in]::before { animation: cs-rule 1300ms var(--ease-out) forwards; }
+@keyframes cs-rule {
+  0% { transform: scaleX(0); opacity: 1; }
+  55% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+[data-rv-armed] .cs-stat[data-rv]:not([data-in]) .cs-num { opacity: 0; }
+[data-rv-armed] .cs-stat[data-rv][data-in] .cs-num { animation: cs-num-in 700ms var(--ease-out) 120ms backwards; }
+@keyframes cs-num-in { from { opacity: 0; transform: translateY(0.18em); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+
+.cs-num {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-size: clamp(88px, 18vw, 220px);
+  line-height: 0.9;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+.cs-of {
+  color: var(--dust);
+  white-space: pre;
+}
+.cs-copy {
+  margin: 0;
+  max-width: 420px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ash);
+}
+.cs-copy strong {
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.cs-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-row {
+    animation: none;
+    transform: none;
+  }
+  .cs-phrase::after {
+    transform: scaleX(1);
+    transition: none;
+  }
+}

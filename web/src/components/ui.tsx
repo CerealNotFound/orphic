@@ -183,7 +183,7 @@ export function EntityCard({ item }: { item: EntityHit }) {
             <LinkStatusBadge status={item.link_status} />
             {item.tags.slice(0, 4).map((t) => (
               <span key={t} className="relative z-10">
-                <TagChip tag={t} href={`/?tag=${encodeURIComponent(t)}`} />
+                <TagChip tag={t} href={`/app?tag=${encodeURIComponent(t)}`} />
               </span>
             ))}
           </div>

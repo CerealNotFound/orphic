@@ -65,7 +65,7 @@ async function Connect({ searchParams }: { searchParams: PageProps<"/connect">["
         <details className="mt-6 text-sm text-subtle">
           <summary className="cursor-pointer">Remembered it? Sign in instead</summary>
           <div className="mt-3">
-            <EmailSignInForm callbackURL="/" />
+            <EmailSignInForm callbackURL="/app" />
           </div>
         </details>
       </div>
