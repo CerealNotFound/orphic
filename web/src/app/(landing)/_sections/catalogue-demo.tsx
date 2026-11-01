@@ -3,6 +3,7 @@
 // details panel all run in the browser: no API calls, nothing to wait for.
 import { useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { track } from "@/lib/analytics";
 import { buildIndex, searchCatalogue } from "@/lib/catalogue-search";
 import type { CatalogueEntry } from "@/lib/public-catalogue";
 import { RevealScope } from "./reveal";
@@ -89,6 +90,14 @@ export function CatalogueDemo({
     window.history.replaceState(null, "", sp.size ? `/explore?${sp}` : "/explore");
   }, [q, cat, full]);
 
+  // What people look for: one event once they stop typing (not one per keystroke).
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) return;
+    const t = setTimeout(() => track("catalogue_search", { query: term, results: total, category: cat || null, page: full ? "explore" : "landing" }), 900);
+    return () => clearTimeout(t);
+  }, [q, cat, total, full]);
+
   // Render more rows as the end of the list comes near (the data is already here).
   useEffect(() => {
     const el = sentinel.current;
@@ -169,7 +178,7 @@ export function CatalogueDemo({
                 All <small>{allCount}</small>
               </button>
               {pills.map((c) => (
-                <button key={c.value} type="button" className="cd-pill" aria-pressed={cat === c.value} onClick={() => setCat(cat === c.value ? "" : c.value)}>
+                <button key={c.value} type="button" className="cd-pill" aria-pressed={cat === c.value} onClick={() => (setCat(cat === c.value ? "" : c.value), track("catalogue_filter", { category: c.value }))}>
                   {humanize(c.value)} <small>{c.count}</small>
                 </button>
               ))}
@@ -237,7 +246,11 @@ function Row({ it, i, bySlug }: { it: CatalogueEntry; i: number; bySlug: Map<str
           </svg>
           <span className="cd-main">
             <span className="cd-head">
-              <a className="cd-name" href={it.href} {...(copy ? {} : { target: "_blank", rel: "noopener noreferrer" })} title={copy ? "Open the saved copy" : `Open ${it.domain ?? "the tool"}`}>
+              <a
+                className="cd-name"
+                href={it.href}
+                {...(copy ? {} : { target: "_blank", rel: "noopener noreferrer" })}
+                onClick={() => track("tool_opened", { slug: it.slug, name: it.name, saved_copy: copy, from: "catalogue" })} title={copy ? "Open the saved copy" : `Open ${it.domain ?? "the tool"}`}>
                 {it.name}
                 <svg className="cd-ext" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 11l6-6M6 5h5v5" />
@@ -257,7 +270,10 @@ function Row({ it, i, bySlug }: { it: CatalogueEntry; i: number; bySlug: Map<str
             aria-expanded={open}
             aria-controls={`cd-d-${it.slug}`}
             aria-label={open ? `Hide details for ${it.name}` : `Show details for ${it.name}`}
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => {
+              if (!open) track("tool_details_opened", { slug: it.slug });
+              setOpen((o) => !o);
+            }}
           >
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 6l4 4 4-4" />

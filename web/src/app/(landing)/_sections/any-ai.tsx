@@ -1,6 +1,6 @@
 "use client";
-
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { track } from "@/lib/analytics";
 import { RevealScope, Words } from "./reveal";
 import "./catalogue-demo.css";
 
@@ -82,6 +82,7 @@ export function AnyAI({ sample }: { sample: AISample | null }) {
       return;
     }
     setCopied(true);
+    track("mcp_copied", { client: tab.label });
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 1400);
   }

@@ -20,11 +20,18 @@ const nextConfig: NextConfig = {
         { source: "/explore/:slug([a-z0-9-]+)", has: wantsMd, destination: "/md/tool/:slug" },
         { source: "/", has: wantsMd, destination: "/llms.txt" },
       ],
-      afterFiles: [],
+      afterFiles: [
+        // PostHog, served from our own domain (see src/instrumentation-client.ts).
+        { source: "/ingest/static/:path*", destination: "https://us-assets.i.posthog.com/static/:path*" },
+        { source: "/ingest/array/:path*", destination: "https://us-assets.i.posthog.com/array/:path*" },
+        { source: "/ingest/:path*", destination: "https://us.i.posthog.com/:path*" },
+      ],
       fallback: [],
     };
   },
   partialPrefetching: true,
+  // PostHog's API paths end in a slash; don't redirect them.
+  skipTrailingSlashRedirect: true,
   turbopack: {
     rules: {
       "*.css": {

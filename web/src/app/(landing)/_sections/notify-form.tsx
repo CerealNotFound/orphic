@@ -1,10 +1,14 @@
 "use client";
 // "Tell me when it opens": the existing waitlist action, styled for the landing page.
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { track } from "@/lib/analytics";
 import { joinWaitlist, type WaitlistState } from "../actions";
 
 export function NotifyForm() {
   const [state, action, pending] = useActionState<WaitlistState, FormData>(joinWaitlist, null);
+  useEffect(() => {
+    if (state?.ok) track("mailing_list_joined");
+  }, [state?.ok]);
   if (state?.ok)
     return (
       <p role="status" className="lp-mono rounded-[14px] border border-[var(--hair-2)] px-5 py-4 text-[13px] text-[var(--bone)]">
