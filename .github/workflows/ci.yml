@@ -47,6 +47,7 @@ jobs:
         run: pnpm tsx scripts/migrate.ts && pnpm tsx scripts/auth-migrate.mts
       - name: Contracts are up to date
         run: pnpm contracts && git diff --exit-code ../contracts
-      - run: npx tsc --noEmit
+      - name: Typecheck (route types come from next typegen)
+        run: npx next typegen && npx tsc --noEmit
       - run: pnpm lint
       - run: pnpm build
