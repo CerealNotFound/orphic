@@ -4,6 +4,14 @@
 
 **A shared memory for the AI tools, workflows and prompts your team spots in Instagram reels.**
 
+<p align="center"><a href="https://orphic.adarshji.com">Live catalogue</a> · <a href="https://orphic.adarshji.com/explore">Search the tools</a> · <a href="https://orphic.adarshji.com/llms.txt">For AI agents</a></p>
+
+Try the open catalogue from your AI, no key needed:
+
+```bash
+claude mcp add --transport http orphic https://orphic.adarshji.com/api/public/mcp
+```
+
 Someone on your team sees a reel ("this Claude skill makes animations…", "comment SKILL and I'll DM you the link"). They share it to the Orphic Telegram bot in two taps. Orphic then:
 1. downloads the reel and transcribes it;
 2. reads the text on screen;
