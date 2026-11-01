@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+.next/
+.env
+.env.local
+.env*.local
+.vercel
+__pycache__/
+*.pyc
+.venv/
+**/worker/work/
+*.log
+.claude/scheduled_tasks.lock
+.claude/settings.local.json

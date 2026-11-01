@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "pending_dm",
+        "unresolved",
+        "needs_user"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "capture": {
+      "type": "object",
+      "properties": {
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shortcode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "creator_handle": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "caption": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transcript": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ocr_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "comments_excerpt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "language": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "archived_content": {
+          "description": "Text copy of the destination page (for DM links)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "description": "One line: what this reel/link is about",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "entities": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Product / resource name as people would search it, e.g. 'Higgsfield'"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "tool",
+              "workflow",
+              "prompt",
+              "template",
+              "repo",
+              "course",
+              "resource",
+              "other"
+            ]
+          },
+          "role": {
+            "default": "primary",
+            "type": "string",
+            "enum": [
+              "primary",
+              "mentioned",
+              "alternative"
+            ]
+          },
+          "canonical_url": {
+            "description": "Official URL. Only set if verified (domain matches, page matches the claim).",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_verified": {
+            "default": false,
+            "type": "boolean"
+          },
+          "aliases": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "description": "1-2 sentences in English: what it is and what it does"
+          },
+          "use_cases": {
+            "default": [],
+            "description": "Short English phrases, e.g. 'turn podcasts into short clips'",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ai-video",
+              "ai-image",
+              "ai-audio-voice",
+              "ai-writing",
+              "ai-coding",
+              "ai-agents-automation",
+              "llm-chat-assistants",
+              "prompts",
+              "design",
+              "marketing-ads",
+              "social-content",
+              "productivity",
+              "research-learning",
+              "data-analytics",
+              "dev-tools",
+              "business-ops",
+              "sales-crm",
+              "finance",
+              "hardware-gadgets",
+              "other"
+            ]
+          },
+          "tags": {
+            "default": [],
+            "description": "lowercase-kebab tags; reuse existing tags when possible",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "search_terms": {
+            "default": [],
+            "description": "10-25 other ways a teammate might search for this: synonyms, plain-English phrasings of the problem it solves, related concepts, common misspellings. E.g. for a clip tool: 'repurpose long videos into shorts', 'podcast to reels'",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pricing": {
+            "description": "free / freemium / paid / open-source, if known",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_creator_owned": {
+            "default": false,
+            "description": "True for the creator's own resource (prompt pack, template, workflow file) only reachable via their DM/link",
+            "type": "boolean"
+          },
+          "creator_handle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "comment_keyword": {
+            "description": "If the reel says 'comment X to get it', the X",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "summary",
+          "category"
+        ]
+      }
+    },
+    "resolves_task_id": {
+      "description": "Set when this link is the DM link that completes an open comment_for_link task",
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reply_note": {
+      "description": "Optional extra line shown to the sender",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "confidence",
+    "capture"
+  ]
+}

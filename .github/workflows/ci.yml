@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: orphic
+          POSTGRES_PASSWORD: orphic
+          POSTGRES_DB: orphic
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U orphic" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://orphic:orphic@localhost:5432/orphic
+      APP_URL: http://localhost:3005
+      BETTER_AUTH_URL: http://localhost:3005
+      BETTER_AUTH_SECRET: ci-only-secret-not-for-production-0000000000
+      TELEGRAM_BOT_TOKEN: "123:ci"
+      TELEGRAM_WEBHOOK_SECRET: ci
+      CRON_SECRET: ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Migrations apply cleanly
+        run: pnpm tsx scripts/migrate.ts && pnpm tsx scripts/auth-migrate.mts
+      - name: Contracts are up to date
+        run: pnpm contracts && git diff --exit-code ../contracts
+      - run: npx tsc --noEmit
+      - run: pnpm lint
+      - run: pnpm build

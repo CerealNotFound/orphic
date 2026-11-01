@@ -1,0 +1,44 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3005",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:migrate": "tsx --env-file=.env.local scripts/migrate.ts && tsx --env-file=.env.local scripts/auth-migrate.mts",
+    "contracts": "tsx scripts/export-contracts.ts",
+    "orphic": "tsx --env-file=.env.local scripts/orphic.ts",
+    "bot:poll": "tsx watch --env-file=.env.local scripts/bot-poll.mts",
+    "typecheck": "tsc --noEmit",
+    "worker": "tsx --env-file=.env.local worker/cli.ts",
+    "vercel-build": "tsx scripts/migrate.ts && tsx scripts/auth-migrate.mts && next build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2",
+    "@vercel/functions": "^3.10.5",
+    "better-auth": "^1.7.14",
+    "grammy": "^1.46.0",
+    "mcp-handler": "^2.3.0",
+    "next": "16.4.3",
+    "pg": "^8.23.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vercel/config": "0.14.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@9.15.9"
+}

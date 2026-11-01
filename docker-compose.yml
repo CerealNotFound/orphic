@@ -1,0 +1,13 @@
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: orphic
+      POSTGRES_PASSWORD: orphic
+      POSTGRES_DB: orphic
+    ports:
+      - "127.0.0.1:54329:5432"  # this Mac only, not the local network
+    volumes:
+      - orphic-db:/var/lib/postgresql/data
+volumes:
+  orphic-db:

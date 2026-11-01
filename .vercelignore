@@ -1,0 +1,15 @@
+# Never upload local secrets, Claude settings or the worker's downloaded media.
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+.claude
+.git
+**/worker/work/
+**/node_modules
+**/.next
+**/*.pem
+**/*.log
+**/tsconfig.tsbuildinfo
